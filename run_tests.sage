@@ -8,6 +8,8 @@
 import datetime  #have to change the name of the module so as not shadow sage's time function
                         #(Who in their right mind shadows builtin module names?).
 import signal
+import sys
+
 __author__ = "Murray Tannock"
 __license__ = "THE BEER-WARE LICENSE"
 __version__ = 1.1
@@ -62,8 +64,10 @@ class TestCase(object):
         if verb:
             print "---"
             print "Testing %s:" % self.function.__name__
+            sys.stdout.flush()
         assert(len(self.inputs)==len(self.expected))
         for k in self.expected:
+            timeouttime = 0
             expected_is_func = type(self.expected[k]) == type(lambda z:z)
             has_multiple_inputs = (type(self.inputs[k]) == tuple)
             try:
@@ -95,7 +99,7 @@ class TestCase(object):
                 t2_ = datetime.datetime.now()
                 timeouttime = t2_-t_
                 if verb:
-                    print "Test %d interrupted after %.4f ms" % (self.tests+1, timeouttime.seconds+timeouttime.microseconds/10^6)
+                    print "Test %d interrupted after %.4f s" % (self.tests+1, timeouttime.seconds+timeouttime.microseconds/10^6)
             except Exception:
                 self.failures += 1
                 if not grading:
@@ -113,6 +117,7 @@ class TestCase(object):
                 print "Time taken for non-timeout tests: %.4f ms (%.4f ms average)" % ((self.time-self.timeouttime)*1000, (self.time-self.timeouttime)/(self.tests-self.timeouts)*1000)
             if self.timeouts > 0:
                 print "Timeouts: %d"% self.timeouts
+            sys.stdout.flush()
 
     @staticmethod
     def buildTestCases(funs=None, ins=None, expt=None, mtimes=None):
