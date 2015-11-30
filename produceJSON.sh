@@ -8,7 +8,7 @@ basedir=Student_work-collect
 assigndir=$basedir/$1
 
 if [[ -z "$2"]]; then
-    echo "Assuming default structure"
+    echo "Assuming default structure" >&2
     solutionsfile=$1_solutions.sage
     testcasefile=~/SMCHomeworkGeneration/$1/$1_grading_testcases
 else

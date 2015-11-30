@@ -1,8 +1,13 @@
 import json
+import sys
 
 infile = sys.argv[1]
 cases = sys.argv[2]
 users = sys.argv[3:]
+
+userstr = ", ".join(users)
+sys.stderr.write("Grading users: %s\n" % userstr)
+sys.stderr.flush()
 
 load(infile)
 load(cases)
@@ -22,3 +27,4 @@ a.update({"total":(sum(x[0] for x in a.values()),sum(x[1] for x in a.values()))}
 
 for user in users:
     print json.dumps({user:a})
+    sys.stdout.flush()
