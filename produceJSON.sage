@@ -7,7 +7,7 @@ cases = sys.argv[2]
 
 load(infile)
 load(cases)
-load('./run_tests.sage')
+load('~/SageTest/run_tests.sage')
 
 tests = TestCase.buildTestCases()
 
