@@ -4,8 +4,8 @@
 # $2 is filename
 # $3 is the file containing the test cases
 
-basedir=Student_work-collect
-assigndir=$basedir/$1
+basedir=E-402-STFO-collect
+assigndir=$basedir/assignments/$1
 
 if [[ -z "$2"]]; then
     echo "Assuming default structure" >&2
@@ -19,10 +19,6 @@ fi
 if [[ -d $assigndir ]]; then
     for student in $(ls $assigndir); do
         filename=$assigndir/$student/$solutionsfile    # this is the file that we're working with
-
-        users=`sed -n 's/.*id:\s*\(.*\)/\1/p' $filename`
-        if [[ -n "$users" ]]; then
-            sage JSON.sage $filename $testcasefile $users
-        fi
+        sage JSON.sage $filename $testcasefile
     done
 fi

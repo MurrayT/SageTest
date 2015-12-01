@@ -118,9 +118,11 @@ class TestCase(object):
             if self.timeouts > 0:
                 print "Timeouts: %d"% self.timeouts
             sys.stdout.flush()
+        if grading:
+           return {self.function.__name__: (int(self.tests - self.failures),int(test.tests))}
 
     @staticmethod
-    def buildTestCases(funs=None, ins=None, expt=None, mtimes=None):
+    def buildTestCases(usrs=None, funs=None, ins=None, expt=None, mtimes=None):
         """ Builds Test cases. Returns a generator over the test cases.
 
         Keyword arguments allow passing in of desired dictionaries for each values.
@@ -133,6 +135,12 @@ class TestCase(object):
         for unpacking when tests are run.
 
         """
+        if not usrs:
+            try:
+                usrs = userids
+                if len(users) < 1:
+                    raise RuntimeError("Users not defined")
+
         if not funs and not ins and not expt and not mtimes:
             try:
                 funs = functions

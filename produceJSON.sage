@@ -1,13 +1,9 @@
 import json
 import sys
+import os
 
 infile = sys.argv[1]
 cases = sys.argv[2]
-users = sys.argv[3:]
-
-userstr = ", ".join(users)
-sys.stderr.write("Grading users: %s\n" % userstr)
-sys.stderr.flush()
 
 load(infile)
 load(cases)
@@ -15,16 +11,30 @@ load('./run_tests.sage')
 
 tests = TestCase.buildTestCases()
 
-a = {}
+userstr = ", ".join(users)
+sys.stderr.write("Grading users: %s\n" % userstr)
+sys.stderr.flush()
 
-for (i,test) in enumerate(tests):
+output_results = {}
+
+for test in tests:
+    sys.stderr.write("-")
+    sys.stderr.flush()
     test.test(verb=False, grading=True)
-    result = (int(test.tests - test.failures),int(test.tests))
-    a.update({i:result})
+    output_results.update(test.test(verb=False, grading=True))
+sys.stderr.write("\n Testing complete\n")
+sys.stderr.flush()
 
-a.update({"total":(sum(x[0] for x in a.values()),sum(x[1] for x in a.values()))})
+output_results.update({"total":(sum(x[0] for x in output_results.values()),sum(x[1] for x in output_results.values()))})
+path_to_folder = os.path.dirname(infile)
+grade_filename = path_to_folder + "/grade"
+file_descriptor = open(grade_filename, "w")
 
+sys.stderr.write("Writing to file %s\n" % grade_filename)
+sys.stderr.flush()
 
+json.dump(output_results,file_descriptor)
+file_descriptor.close()
 for user in users:
-    print json.dumps({user:a})
+    print json.dumps({user:output_results})
     sys.stdout.flush()
