@@ -138,7 +138,7 @@ class TestCase(object):
         if not usrs:
             try:
                 usrs = userids
-                if len(users) < 1:
+                if len(usrs) < 1:
                     raise RuntimeError("Users not defined")
 
         if not funs and not ins and not expt and not mtimes:
