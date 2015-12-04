@@ -9,6 +9,7 @@ import datetime  #have to change the name of the module so as not shadow sage's 
                         #(Who in their right mind shadows builtin module names?).
 import signal
 import sys
+import os
 
 __author__ = "Murray Tannock"
 __license__ = "THE BEER-WARE LICENSE"
@@ -138,7 +139,10 @@ class TestCase(object):
         if not usrs:
             usrs = userids
             if len(usrs) < 1:
-                raise RuntimeError("Users not defined")
+                if not grading:
+                    raise RuntimeError("Users not defined")
+                else:
+                    os.exit(1)
 
         if not funs and not ins and not expt and not mtimes:
             try:
