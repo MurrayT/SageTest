@@ -11,7 +11,7 @@ load('~/SageTest/run_tests.sage')
 
 tests = TestCase.buildTestCases()
 
-userstr = ", ".join(users)
+userstr = ", ".join(userids)
 sys.stderr.write("Grading users: %s\n" % userstr)
 sys.stderr.flush()
 
@@ -35,6 +35,6 @@ sys.stderr.flush()
 
 json.dump(output_results,file_descriptor)
 file_descriptor.close()
-for user in users:
+for user in userids:
     print json.dumps({user:output_results})
     sys.stdout.flush()
