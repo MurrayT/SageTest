@@ -66,24 +66,29 @@ class TestCase(object):
             print "---"
             print "Testing %s:" % self.function.__name__
             sys.stdout.flush()
-        assert(len(self.inputs)==len(self.expected))
+        if self.inputs:
+            assert(len(self.inputs)==len(self.expected))
         for k in self.expected:
             timeouttime = 0
             expected_is_func = type(self.expected[k]) == type(lambda z:z)
-            has_multiple_inputs = (type(self.inputs[k]) == tuple)
+            input_type = int(type(self.inputs[k]) == tuple) if self.inputs else -1
             try:
                 t_ = datetime.datetime.now()
                 signal.signal(signal.SIGALRM, timeout_handler)
                 signal.alarm(self.maxtime)
                 if expected_is_func: #allows passing a function to use for verification, instead of comparing
                                      #to expected output, passes output into a function and expects true in response
-                    if has_multiple_inputs: #allows functions with multiple input
+                    if input_type == 1: #allows functions with multiple input
                         assert(self.expected[k](self.function(*self.inputs[k])))
+                    elif input_type == -1: # allows function with no input
+                        assert(self.expected[k](self.function()))
                     else:
                         assert(self.expected[k](self.function(self.inputs[k])))
                 else:
-                    if has_multiple_inputs: #allows functions with multiple input
+                    if input_type == 1: #allows functions with multiple input
                         assert(self.function(*self.inputs[k])==self.expected[k])
+                    elif input_type == -1: # allows function with no input
+                        assert(self.function()==self.expected[k])
                     else:
                         assert(self.function(self.inputs[k])==self.expected[k])
             except AssertionError:
