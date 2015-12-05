@@ -25,7 +25,8 @@ for test in tests:
 sys.stderr.write("\n Testing complete\n")
 sys.stderr.flush()
 
-output_results.update({"total":(sum(x[0] for x in output_results.values()),sum(x[1] for x in output_results.values()))})
+output_results.update({"total": (sum(x[0] for x in output_results.values()),
+                                 sum(x[1] for x in output_results.values()))})
 path_to_folder = os.path.dirname(infile)
 grade_filename = path_to_folder + "/grade"
 file_descriptor = open(grade_filename, "w")
@@ -33,8 +34,8 @@ file_descriptor = open(grade_filename, "w")
 sys.stderr.write("Writing to file %s\n" % grade_filename)
 sys.stderr.flush()
 
-json.dump(output_results,file_descriptor)
+json.dump(output_results, file_descriptor)
 file_descriptor.close()
 for user in userids:
-    print json.dumps({user:output_results})
+    print json.dumps({user: output_results})
     sys.stdout.flush()
