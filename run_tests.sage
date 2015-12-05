@@ -1,15 +1,18 @@
-#To import use 'runfile ('run_tests.sage')'
-#Functions, inputs, expected and timeouts are dictionaries, with inputs and expected being dicts of dicts.
-#'testRunner(TestCase.buildTestCases())' will build testcases and run from module level dictionaries.
-"""Tests.sage: Allows testing of arbitrary functions to see if input matches expected output.
-   Also fully python 2.7.8 safe.
+# To import use 'runfile ('run_tests.sage')'
+# Functions, inputs, expected and timeouts are dictionaries, with inputs and
+# expected being dicts of dicts. 'testRunner(TestCase.buildTestCases())' will
+# build testcases and run from module level dictionaries.
+"""Tests.sage: Allows testing of arbitrary functions to see if input matches
+    expected output. Also fully python 2.7.8 safe.
 """
-
-import datetime  #have to change the name of the module so as not shadow sage's time function
-                        #(Who in their right mind shadows builtin module names?).
+# Have to change the name of the module so as not shadow
+# sage's time function
+# (Who in their right mind shadows builtin module names?).
+import datetime
 import signal
 import sys
 import os
+import types
 
 __author__ = "Murray Tannock"
 __license__ = "THE BEER-WARE LICENSE"
@@ -18,26 +21,30 @@ __email__ = "murray14@ru.is"
 
 # --------------------------------------------------------------------------------
 # "THE BEER-WARE LICENSE" (Revision 42):
-# <murraytannock@gmail.com> wrote this file. As long as you retain this notice you
-# can do whatever you want with this stuff. If we meet some day, and you think
+# <murraytannock@gmail.com> wrote this file. As long as you retain this notice
+# can whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return. Murray Tannock
 # --------------------------------------------------------------------------------
-
 
 
 class TimeoutError(Exception):
     pass
 
+
 def timeout_handler(signum, frame):
     raise TimeoutError
 
+
 class TestCase(object):
     """ Class for each test case
-    This defines a test case as a function, a dict of inputs, and a dict of expected outputs.
+    This defines a test case as a function, a dict of inputs, and a dict of
+    expected outputs.
 
-    It records the number of tests, failures, timeouts, and the total time spent testing
+    It records the number of tests, failures, timeouts, and the total time
+    spent testing
 
-    Initialised with the function, the input dictionary, and the expected dictionary
+    Initialised with the function, the input dictionary, and the expected
+    dictionary
     """
     def __init__(self, function, inputs, expected, maxtime):
         self.function = function
@@ -67,35 +74,42 @@ class TestCase(object):
             print "Testing %s:" % self.function.__name__
             sys.stdout.flush()
         if self.inputs:
-            assert(len(self.inputs)==len(self.expected))
+            assert(len(self.inputs) == len(self.expected))
         for k in self.expected:
             timeouttime = 0
-            expected_is_func = type(self.expected[k]) == type(lambda z:z)
-            input_type = int(type(self.inputs[k]) == tuple) if self.inputs else -1
+            expected_is_func = isinstance(self.expected[k], types.FunctionType)
+            input_type = (int(isinstance(self.inputs[k], tuple))
+                          if self.inputs else -1)
             try:
                 t_ = datetime.datetime.now()
                 signal.signal(signal.SIGALRM, timeout_handler)
                 signal.alarm(self.maxtime)
-                if expected_is_func: #allows passing a function to use for verification, instead of comparing
-                                     #to expected output, passes output into a function and expects true in response
-                    if input_type == 1: #allows functions with multiple input
-                        assert(self.expected[k](self.function(*self.inputs[k])))
-                    elif input_type == -1: # allows function with no input
+                if expected_is_func:    # allows passing a function to use for
+                                        # verification, instead of comparing
+                                        # to expected output, passes output
+                                        # into a function and expects true in
+                                        # response
+                    if input_type == 1:  # allows functions with multiple input
+                        assert(self.expected[k](
+                               self.function(*self.inputs[k])))
+                    elif input_type == -1:  # allows function with no input
                         assert(self.expected[k](self.function()))
                     else:
                         assert(self.expected[k](self.function(self.inputs[k])))
                 else:
-                    if input_type == 1: #allows functions with multiple input
-                        assert(self.function(*self.inputs[k])==self.expected[k])
-                    elif input_type == -1: # allows function with no input
-                        assert(self.function()==self.expected[k])
+                    if input_type == 1:  # allows functions with multiple input
+                        assert(self.function(
+                               *self.inputs[k]) == self.expected[k])
+                    elif input_type == -1:  # allows function with no input
+                        assert(self.function() == self.expected[k])
                     else:
-                        assert(self.function(self.inputs[k])==self.expected[k])
+                        assert(self.function(
+                               self.inputs[k]) == self.expected[k])
             except AssertionError:
                 self.failures += 1
                 if verb:
                     if self.failures <= showfails:
-                        print "Test %d failed." % int(self.tests+1),
+                        print "Test %d failed." % int(self.tests + 1),
                         if superverb:
                             print "Input: " + str(self.inputs[k]),
                         print ""
@@ -105,7 +119,10 @@ class TestCase(object):
                 t2_ = datetime.datetime.now()
                 timeouttime = t2_-t_
                 if verb:
-                    print "Test %d interrupted after %.4f s" % (self.tests+1, timeouttime.seconds+timeouttime.microseconds/10^6)
+                    interp = (self.tests + 1,
+                              timeouttime.seconds +
+                              timeouttime.microseconds / 10 ^ 6)
+                    print "Test %d interrupted after %.4f s" % interp
             except Exception:
                 self.failures += 1
                 if not grading:
@@ -114,35 +131,53 @@ class TestCase(object):
                 signal.alarm(0)
                 self.tests += 1
                 time = datetime.datetime.now()-t_
-                self.time += time.seconds + time.microseconds / 10^6
+                self.time += time.seconds + time.microseconds / 10 ^ 6
                 if not timeouttime == 0:
-                    self.timeouttime += timeouttime.seconds + timeouttime.microseconds / 10^6
+                    self.timeouttime += (timeouttime.seconds +
+                                         timeouttime.microseconds / 10 ^ 6)
         if verb:
-            print "Tests complete: %d of %d passed (%d failure(s))" %(self.tests - self.failures, self.tests, self.failures)
+            results = (self.tests - self.failures, self.tests, self.failures)
+            print "Tests complete: %d of %d passed (%d failure(s))" % results
             if not self.tests-self.timeouts == 0:
-                print "Time taken for non-timeout tests: %.4f ms (%.4f ms average)" % ((self.time-self.timeouttime)*1000, (self.time-self.timeouttime)/(self.tests-self.timeouts)*1000)
+                timeoutresults = ((self.time - self.timeouttime) * 1000,
+                                  (self.time - self.timeouttime) /
+                                  (self.tests - self.timeouts) * 1000)
+                print "Time taken for non-timeout tests: %.4f ms \
+                        (%.4f ms average)" % timeoutresults
             if self.timeouts > 0:
-                print "Timeouts: %d"% self.timeouts
+                print "Timeouts: %d" % self.timeouts
             sys.stdout.flush()
         if grading:
-           return {self.function.__name__: (int(self.tests - self.failures),int(test.tests))}
+            return {self.function.__name__: (int(self.tests - self.failures),
+                                             int(self.tests))}
 
     @staticmethod
-    def buildTestCases(usrs=None, funs=None, ins=None, expt=None, mtimes=None):
+    def buildTestCases(usrs=None,
+                       funs=None,
+                       ins=None,
+                       expt=None,
+                       mtimes=None,
+                       grading=False):
         """ Builds Test cases. Returns a generator over the test cases.
 
-        Keyword arguments allow passing in of desired dictionaries for each values.
-        Note: the three dictionaries must have identical immutable keys. (No lists)
+        Keyword arguments allow passing in of desired dictionaries for each
+        values.
+        Note: the three dictionaries must have identical immutable keys.
+        (No lists)
 
-        If no arguments are passed function will attempt to use module level variables 'functions',
+        If no arguments are passed function will attempt to use module level
+        variables 'functions',
         'inputs' and 'expected' for the source for test cases.
 
-        functions with multiple arguments require arguments to be passed in the input dictionary as tuples to allow
-        for unpacking when tests are run.
+        functions with multiple arguments require arguments to be passed in the
+        input dictionary as tuples to allow for unpacking when tests are run.
 
         """
         if not usrs:
-            usrs = userids
+            try:
+                usrs = userids
+            except NameError:
+                raise
             if len(usrs) < 1:
                 if not grading:
                     raise RuntimeError("Users not defined")
@@ -156,14 +191,21 @@ class TestCase(object):
                 expt = expected
                 mtimes = maxtimes
 
-            except NameError: #raises an error if no input is given and any of the module level
-                              #variables are undefined. (Should probably catch type errors here to)
+            except NameError:   # raises an error if no input is given and any
+                                # of the module level variables are undefined.
+                                # (Should probably catch type errors here to)
                 raise
 
         return (TestCase(funs[i], ins[i], expt[i], mtimes[i]) for i in funs)
 
-def testRunner(test_cases, verb=True, showfails=5, superverb=False, grading=False):
-    """Runs test cases contained inside an iterable object passed in and prints result.
+
+def testRunner(test_cases,
+               verb=True,
+               showfails=5,
+               superverb=False,
+               grading=False):
+    """Runs test cases contained inside an iterable object passed in and prints
+    result.
 
        verb flag can be used to suppress non-vital output.
     """
@@ -177,7 +219,10 @@ def testRunner(test_cases, verb=True, showfails=5, superverb=False, grading=Fals
     time = 0
     timeouttime = 0
     for case in test_cases:
-        case.test(verb=verb, showfails=showfails, superverb=superverb, grading=grading)
+        case.test(verb=verb,
+                  showfails=showfails,
+                  superverb=superverb,
+                  grading=grading)
         failures += case.failures
         tests_completed += case.tests
         timeouts += case.timeouts
@@ -188,9 +233,13 @@ def testRunner(test_cases, verb=True, showfails=5, superverb=False, grading=Fals
         print "---"
     print "Results:"
     print "%d Functions tested" % functions_tested
-    print "%d of %d tests passed (%d failure(s))" %(tests_completed - failures, tests_completed, failures)
+    totalresults = (tests_completed - failures, tests_completed, failures)
+    print "%d of %d tests passed (%d failure(s))" % totalresults
     success_rate = (tests_completed-failures)/float(tests_completed)
     print "Success rate: %.2f %%" % (success_rate*100)
     if timeouts > 0:
         print "%d timeouts" % timeouts
-    print "Total time: %.4f ms. (%.4f ms on timeouts, %.4f ms on completed tests)" % (time*1000, timeouttime*1000, (time-timeouttime)*1000)
+
+    timeoutresults = (time*1000, timeouttime*1000, (time-timeouttime)*1000)
+    print "Total time: %.4f ms. (%.4f ms on timeouts, %.4f ms on completed\
+            tests)" % timeoutresults
