@@ -9,7 +9,7 @@ load(infile)
 load(cases)
 load('~/SageTest/run_tests.sage')
 
-tests = TestCase.buildTestCases()
+tests = TestCase.buildTestCases(grading=True)
 
 userstr = ", ".join(userids)
 sys.stderr.write("Grading users: %s\n" % userstr)
