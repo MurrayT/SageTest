@@ -235,7 +235,8 @@ def testRunner(test_cases,
     print "%d Functions tested" % functions_tested
     totalresults = (tests_completed - failures, tests_completed, failures)
     print "%d of %d tests passed (%d failure(s))" % totalresults
-    success_rate = (tests_completed-failures)/float(tests_completed)
+    success_rate = ((tests_completed-failures)/float(tests_completed)
+                    if tests_completed > 0 else 1.0)
     print "Success rate: %.2f %%" % (success_rate*100)
     if timeouts > 0:
         print "%d timeouts" % timeouts
