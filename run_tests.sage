@@ -11,7 +11,6 @@
 import datetime
 import signal
 import sys
-import os
 import types
 
 __author__ = "Murray Tannock"
@@ -182,7 +181,7 @@ class TestCase(object):
                 if not grading:
                     raise RuntimeError("Users not defined")
                 else:
-                    os.exit(1)
+                    sys.exit(1)
 
         if not funs and not ins and not expt and not mtimes:
             try:
