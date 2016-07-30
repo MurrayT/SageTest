@@ -3,19 +3,18 @@
 # expected being dicts of dicts. 'testRunner(TestCase.buildTestCases())' will
 # build testcases and run from module level dictionaries.
 """Tests.sage: Allows testing of arbitrary functions to see if input matches
-    expected output. Also fully python 2.7.8 safe.
+    expected output.
 """
 # Have to change the name of the module so as not shadow
 # sage's time function
 # (Who in their right mind shadows builtin module names?).
 import datetime
-import signal
 import sys
 import types
 
 __author__ = "Murray Tannock"
 __license__ = "THE BEER-WARE LICENSE"
-__version__ = 1.1
+__version__ = 1.2
 __email__ = "murray14@ru.is"
 
 # --------------------------------------------------------------------------------
@@ -24,14 +23,6 @@ __email__ = "murray14@ru.is"
 # can whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return. Murray Tannock
 # --------------------------------------------------------------------------------
-
-
-class TimeoutError(Exception):
-    pass
-
-
-def timeout_handler(signum, frame):
-    raise TimeoutError
 
 
 class TestCase(object):
@@ -81,8 +72,7 @@ class TestCase(object):
                           if self.inputs else -1)
             try:
                 t_ = datetime.datetime.now()
-                signal.signal(signal.SIGALRM, timeout_handler)
-                signal.alarm(self.maxtime)
+                alarm(self.maxtime)     # now using sage builtin
                 if expected_is_func:    # allows passing a function to use for
                                         # verification, instead of comparing
                                         # to expected output, passes output
@@ -112,7 +102,7 @@ class TestCase(object):
                         if superverb:
                             print "Input: " + str(self.inputs[k]),
                         print ""
-            except (KeyboardInterrupt, TimeoutError):
+            except (KeyboardInterrupt, AlarmInterrupt):
                 self.failures += 1
                 self.timeouts += 1
                 t2_ = datetime.datetime.now()
@@ -127,7 +117,7 @@ class TestCase(object):
                 if not grading:
                     raise
             finally:
-                signal.alarm(0)
+                cancel_alarm()
                 self.tests += 1
                 time = datetime.datetime.now()-t_
                 self.time += time.seconds + time.microseconds / 10 ^ 6
