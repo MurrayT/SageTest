@@ -232,4 +232,4 @@ def testRunner(test_cases,
 
     timeoutresults = (time*1000, timeouttime*1000, (time-timeouttime)*1000)
     print "Total time: %.4f ms. (%.4f ms on timeouts, %.4f ms on completed\
-tests)" % timeoutresults
+ tests)" % timeoutresults
