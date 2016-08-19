@@ -132,7 +132,7 @@ class TestCase(object):
                                   (self.time - self.timeouttime) /
                                   (self.tests - self.timeouts) * 1000)
                 print "Time taken for non-timeout tests: %.4f ms \
-                        (%.4f ms average)" % timeoutresults
+(%.4f ms average)" % timeoutresults
             if self.timeouts > 0:
                 print "Timeouts: %d" % self.timeouts
             sys.stdout.flush()
@@ -232,4 +232,4 @@ def testRunner(test_cases,
 
     timeoutresults = (time*1000, timeouttime*1000, (time-timeouttime)*1000)
     print "Total time: %.4f ms. (%.4f ms on timeouts, %.4f ms on completed\
-            tests)" % timeoutresults
+tests)" % timeoutresults
