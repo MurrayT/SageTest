@@ -174,8 +174,8 @@ class TestRun(object):
                 timeoutresults = ((self.time - self.timeout_time) * 1000,
                                   (self.time - self.timeout_time) /
                                   (self.tests - self.timeouts) * 1000)
-                print("Time taken for non-timeout tests: %.4f ms \
-(%.4f ms average)" % timeoutresults)
+                print("Time taken for non-timeout tests: %.4f ms"
+                      "(%.4f ms average)" % timeoutresults)
             if self.timeouts > 0:
                 print("Timeouts: %d" % self.timeouts)
             sys.stdout.flush()
