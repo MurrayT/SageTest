@@ -31,7 +31,7 @@ class TimeoutError(Exception):
 
 
 def timeout_handler(signum, frame):
-    raise TimeoutError
+    raise TimeoutError()
 
 
 class TestCase(object):
