@@ -17,6 +17,7 @@ def timeout_handler(signum, frame):
 
 lambda_re = re.compile(r"^lambda")
 
+
 def ensure_path(path):
     '''
     Check if the directory at path exists,
@@ -31,5 +32,5 @@ def ensure_path(path):
             raise
     return path
 
-GRADING=0
-REVEALED=1
+GRADING = 0
+REVEALED = 1
